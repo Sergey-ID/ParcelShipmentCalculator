@@ -1,4 +1,6 @@
-﻿using ParcelShipmentCalculator.Engine.Data;
+﻿using System;
+using System.Linq;
+using ParcelShipmentCalculator.Engine.Data;
 using ParcelShipmentCalculator.Engine.Models;
 
 namespace ParcelShipmentCalculator.Engine.Builders
@@ -6,35 +8,56 @@ namespace ParcelShipmentCalculator.Engine.Builders
     public class ParcelCostBuilder : IParcelCostBuilder
     {
         private readonly IPriceRepository _priceRepository;
-        private ParcelShipmentReceipt _parcelShipmentReceipt;
+        private readonly ParcelShipmentReceipt _parcelShipmentReceipt;
 
         public ParcelCostBuilder(IPriceRepository priceRepository)
         {
             this._priceRepository = priceRepository;
+            this._parcelShipmentReceipt = new ParcelShipmentReceipt();
         }
 
         /// <inheritdoc/>
-        public IParcelCostBuilder SetBaseCost(ParcelShipmentRequest parcel)
+        public IParcelCostBuilder SetBaseCost(ParcelShipmentRequest shipmentRequest)
         {
-            throw NotImplementedException();
+            foreach (var parcel in shipmentRequest.Parcels)
+            {
+                var maxDimension = parcel.Dimensions.Max();
+
+                var applicableRule = _priceRepository.ParcelSizeRules
+                    .Where(r => maxDimension < r.MaxDimension)
+                    .OrderBy(r => r.MaxDimension)
+                    .FirstOrDefault();
+
+                var price = applicableRule.Price;
+
+                var receiptLine = new ReceiptLine
+                {
+                    Description = $"{applicableRule.Name} Parcel with max dimension {maxDimension}",
+                    Cost = price
+                };
+
+                _parcelShipmentReceipt.ReceiptLines.Add(receiptLine);
+            }
+
+            return this;
         }
 
         /// <inheritdoc/>
-        public IParcelCostBuilder AddWeightCharge(ParcelShipmentRequest parcel)
+        public IParcelCostBuilder AddWeightCharge(ParcelShipmentRequest shipmentRequest)
         {
-            throw NotImplementedException();
+            throw new NotImplementedException();
         }
 
         /// <inheritdoc/>
-        public IParcelCostBuilder ApplySpeedyShipping(ParcelShipmentRequest parcel)
+        public IParcelCostBuilder ApplySpeedyShipping(ParcelShipmentRequest shipmentRequest)
         {
-            throw NotImplementedException();
+            throw new NotImplementedException();
         }
 
         /// <inheritdoc/>
-        public IParcelCostBuilder ApplyDiscounts(ParcelShipmentRequest currentParcel)
+        public IParcelCostBuilder ApplyDiscounts(ParcelShipmentRequest shipmentRequest)
         {
-            throw NotImplementedException();
+            throw new NotImplementedException();
         }
 
         /// <inheritdoc/>

@@ -9,28 +9,28 @@ namespace ParcelShipmentCalculator.Engine.Builders
         /// Calculate the base cost of the parcel based on the dimensions
         /// </summary>
         /// <returns></returns>
-        IParcelCostBuilder SetBaseCost(ParcelShipmentRequest parcel);
+        IParcelCostBuilder SetBaseCost(ParcelShipmentRequest shipmentRequest);
         
         /// <summary>
         /// Calculate the weight charge of the parcel
         /// </summary>
-        /// <param name="parcel"></param>
+        /// <param name="shipmentRequest"></param>
         /// <returns></returns>
-        IParcelCostBuilder AddWeightCharge(ParcelShipmentRequest parcel);
+        IParcelCostBuilder AddWeightCharge(ParcelShipmentRequest shipmentRequest);
 
         /// <summary>
         /// Add speedy shipping charge to the end cost.If the shipment is a speedy shipment the cost is doubled
         /// </summary>
-        /// <param name="parcel"></param>
+        /// <param name="shipmentRequest"></param>
         /// <returns></returns>
-        IParcelCostBuilder ApplySpeedyShipping(ParcelShipmentRequest parcel);
+        IParcelCostBuilder ApplySpeedyShipping(ParcelShipmentRequest shipmentRequest);
 
         /// <summary>
         /// Apply all applicable discounts to the shipment
         /// </summary>
-        /// <param name="parcels"></param>
+        /// <param name="shipmentRequest"></param>
         /// <returns></returns>
-        IParcelCostBuilder ApplyDiscounts(ParcelShipmentRequest parcels);
+        IParcelCostBuilder ApplyDiscounts(ParcelShipmentRequest shipmentRequest);
 
         /// <summary>
         /// Get the final receipt of the shipment
