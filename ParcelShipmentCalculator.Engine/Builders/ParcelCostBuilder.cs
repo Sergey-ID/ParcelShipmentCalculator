@@ -28,15 +28,18 @@ namespace ParcelShipmentCalculator.Engine.Builders
                     .OrderBy(r => r.MaxDimension)
                     .FirstOrDefault();
 
-                var price = applicableRule.Price;
-
-                var receiptLine = new ReceiptLine
+                if (!applicableRule.Equals(default(ParcelSizeRule)))
                 {
-                    Description = $"{applicableRule.Name} Parcel with max dimension {maxDimension}",
-                    Cost = price
-                };
+                    var price = applicableRule.Price;
 
-                _parcelShipmentReceipt.ReceiptLines.Add(receiptLine);
+                    var receiptLine = new ReceiptLine
+                    {
+                        Description = $"{applicableRule.Name} Parcel with max dimension {maxDimension}",
+                        Cost = price
+                    };
+
+                    _parcelShipmentReceipt.ReceiptLines.Add(receiptLine);
+                }
             }
 
             return this;
@@ -45,7 +48,36 @@ namespace ParcelShipmentCalculator.Engine.Builders
         /// <inheritdoc/>
         public IParcelCostBuilder AddWeightCharge(ParcelShipmentRequest shipmentRequest)
         {
-            throw new NotImplementedException();
+            foreach (var parcel in shipmentRequest.Parcels)
+            {
+                var maxDimension = parcel.Dimensions.Max();
+
+                // Find the size rule to determine the parcel's name (size classification)
+                var sizeRule = _priceRepository.ParcelSizeRules
+                    .Where(r => maxDimension < r.MaxDimension)
+                    .OrderBy(r => r.MaxDimension)
+                    .FirstOrDefault();
+
+                // Find the weight rule that corresponds to the size classification
+                var weightRule = _priceRepository.ParcelWeightRules
+                    .FirstOrDefault(wr => wr.Name == sizeRule.Name);
+
+                if (!weightRule.Equals(default(ParcelWeightRule)))
+                {
+                    var excessWeight = parcel.Weight - weightRule.WeightLimit;
+                    var weightCharge = excessWeight > 0 ? (decimal)excessWeight * weightRule.OverweightChargePerKg : 0;
+
+                    var weightChargeLine = new ReceiptLine
+                    {
+                        Description = $"Overweight Charge for {sizeRule.Name} Parcel",
+                        Cost = weightCharge
+                    };
+
+                    _parcelShipmentReceipt.ReceiptLines.Add(weightChargeLine);
+                }
+            }
+
+            return this;
         }
 
         /// <inheritdoc/>
