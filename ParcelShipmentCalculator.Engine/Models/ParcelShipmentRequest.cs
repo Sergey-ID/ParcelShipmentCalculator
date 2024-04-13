@@ -2,8 +2,12 @@
 
 namespace ParcelShipmentCalculator.Engine.Models
 {
-    public class ParcelShipmentRequest : Parcel
+    public class ParcelShipmentRequest
     {
+        /// <summary>
+        /// List of parcels in the shipment
+        /// </summary>
+        public List<Parcel> Parcels { get; set; } = new List<Parcel>();
         /// <summary>
         /// This flag indicates if the shipment is a speedy shipment
         /// </summary>
