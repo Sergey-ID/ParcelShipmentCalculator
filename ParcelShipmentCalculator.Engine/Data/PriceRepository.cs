@@ -79,7 +79,7 @@ namespace ParcelShipmentCalculator.Engine.Data
                 {
                     WeightRuleId = 4,
                     Name = "Extra Large",
-                    WeightLimit = double.MaxValue,
+                    WeightLimit = 10,
                     OverweightChargePerKg = 2
                 }
             };
