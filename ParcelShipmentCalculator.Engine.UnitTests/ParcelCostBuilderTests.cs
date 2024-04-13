@@ -6,6 +6,7 @@ namespace ParcelShipmentCalculator.Engine.UnitTests
 {
     public class ParcelCostBuilderTests
     {
+        #region SetBaseCost Rules
         //NOTE: If total is correct then line items are correct
         [Theory]
         [InlineData(new double[] { 5, 5, 5 }, 3)]   // Small parcel
@@ -28,7 +29,7 @@ namespace ParcelShipmentCalculator.Engine.UnitTests
             };
 
             // Act
-            var receipt = parcelCostBuilder.SetBaseCost(new ParcelShipmentRequest() { Parcels = {parcel} }).Build();
+            var receipt = parcelCostBuilder.SetBaseCost(new ParcelShipmentRequest() { Parcels = { parcel } }).Build();
 
             // Assert
             Assert.Equal(expectedPrice, receipt.Total);
@@ -61,7 +62,7 @@ namespace ParcelShipmentCalculator.Engine.UnitTests
                 {
                     new List<double[]>
                     {
-                        new double[] { 1, 5, 9 }, 
+                        new double[] { 1, 5, 9 },
                         new double[] { 25, 25, 25 }
                     }, // Two parcels
                     11 // Expected total price
@@ -70,7 +71,7 @@ namespace ParcelShipmentCalculator.Engine.UnitTests
                 {
                     new List<double[]>
                     {
-                        new double[] { 10, 5, 9 },  
+                        new double[] { 10, 5, 9 },
                         new double[] { 25, 25, 25 },
                         new double[] { 25, 50, 99 },
                         new double[] { 100, 100, 100 },
@@ -82,12 +83,41 @@ namespace ParcelShipmentCalculator.Engine.UnitTests
                 {
                     new List<double[]>
                     {
-                        new double[] { 10, 10, 10 }, 
+                        new double[] { 10, 10, 10 },
                         new double[] { 25, 50, 50 },
                         new double[] { 25, 50, 100 },
                     }, // Three parcels
                     48 // Expected total price
                 }
             };
+        #endregion
+
+        #region AddWeightCharge Rules
+        [Theory]
+        [InlineData(9, 1.5, 1)]  // Small parcel slightly over limit
+        [InlineData(9, 0.5, 0)]  // Small parcel under limit
+        [InlineData(30, 4, 2)]   // Medium parcel slightly over limit
+        [InlineData(99, 7, 2)]  // Large parcel slightly over limit
+        [InlineData(100, 15, 10)] // XL parcel over limit
+        public void AddWeightCharge_CorrectChargesApplied(double dimension, double weight, decimal expectedCharge)
+        {
+            // Arrange
+            var parcels = new List<Parcel>
+            {
+                new Parcel { Dimensions = new List<double> { dimension, dimension, dimension }, Weight = weight }
+            };
+            var shipmentRequest = new ParcelShipmentRequest { Parcels = parcels };
+            var mockRepository = new PriceRepository();
+            var builder = new ParcelCostBuilder(mockRepository);
+
+            // Act
+            builder.AddWeightCharge(shipmentRequest);
+
+            // Assert
+            var lastReceiptLine = builder.Build().ReceiptLines.LastOrDefault();
+            Assert.Equal(expectedCharge, lastReceiptLine?.Cost);
+            Assert.Contains("Overweight Charge for", lastReceiptLine?.Description);
+        }
+        #endregion
     }
 }
