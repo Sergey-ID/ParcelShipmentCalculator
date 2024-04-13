@@ -1,10 +1,17 @@
-﻿using ParcelShipmentCalculator.Engine.Models;
+﻿using ParcelShipmentCalculator.Engine.Data;
+using ParcelShipmentCalculator.Engine.Models;
 
 namespace ParcelShipmentCalculator.Engine.Builders
 {
     public class ParcelCostBuilder : IParcelCostBuilder
     {
+        private readonly IPriceRepository _priceRepository;
         private ParcelShipmentReceipt _parcelShipmentReceipt;
+
+        public ParcelCostBuilder(IPriceRepository priceRepository)
+        {
+            this._priceRepository = priceRepository;
+        }
 
         /// <inheritdoc/>
         public IParcelCostBuilder SetBaseCost(ParcelShipmentRequest parcel)
@@ -31,9 +38,6 @@ namespace ParcelShipmentCalculator.Engine.Builders
         }
 
         /// <inheritdoc/>
-        public ParcelShipmentReceipt Build()
-        {
-            throw NotImplementedException();
-        }
+        public ParcelShipmentReceipt Build() => _parcelShipmentReceipt;
     }
 }
