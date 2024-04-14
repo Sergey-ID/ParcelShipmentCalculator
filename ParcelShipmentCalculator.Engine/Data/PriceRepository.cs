@@ -17,7 +17,8 @@ namespace ParcelShipmentCalculator.Engine.Data
         /// <summary>
         /// Keeps of rules to calculate the price of a parcel
         /// </summary>
-        //NOTE: This is a placeholder for the actual implementation to pull data from DB
+        // NOTE: This is a placeholder for the actual implementation to pull data from DB
+        // TODO: This should be refactored to include weight based naming and pricing
         public PriceRepository()
         {
             ParcelSizeRules = new List<ParcelSizeRule>

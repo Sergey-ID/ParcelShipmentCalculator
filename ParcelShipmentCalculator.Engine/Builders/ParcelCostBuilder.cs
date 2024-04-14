@@ -16,7 +16,10 @@ namespace ParcelShipmentCalculator.Engine.Builders
             this._parcelShipmentReceipt = new ParcelShipmentReceipt();
         }
 
+        //TODO: Add a method to set parcel type based on dimensions and weight
+
         /// <inheritdoc/>
+        // TODO: should be refactored to calculate cost based on name
         public IParcelCostBuilder SetBaseCost(ParcelShipmentRequest shipmentRequest)
         {
             foreach (var parcel in shipmentRequest.Parcels)
@@ -46,6 +49,7 @@ namespace ParcelShipmentCalculator.Engine.Builders
         }
 
         /// <inheritdoc/>
+        // TODO: not optimal, can be refactored to reduce calls to the database
         public IParcelCostBuilder AddWeightCharge(ParcelShipmentRequest shipmentRequest)
         {
             foreach (var parcel in shipmentRequest.Parcels)
@@ -83,12 +87,14 @@ namespace ParcelShipmentCalculator.Engine.Builders
         /// <inheritdoc/>
         public IParcelCostBuilder ApplySpeedyShipping(ParcelShipmentRequest shipmentRequest)
         {
+            // TODO: Implement speedy shipping logic adding a new receipt line with the doubled cost
             throw new NotImplementedException();
         }
 
         /// <inheritdoc/>
         public IParcelCostBuilder ApplyDiscounts(ParcelShipmentRequest shipmentRequest)
         {
+            // TODO: Implement discount logic of the rules based discount system
             throw new NotImplementedException();
         }
 
